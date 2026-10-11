@@ -1,0 +1,16 @@
+{
+  "name": "SUD - CYD display",
+  "version": "__VER__",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "firmware/cyd/bootloader.bin", "offset": 4096 },
+        { "path": "firmware/cyd/partitions.bin", "offset": 32768 },
+        { "path": "firmware/cyd/boot_app0.bin", "offset": 57344 },
+        { "path": "firmware/cyd/firmware.bin", "offset": 65536 }
+      ]
+    }
+  ]
+}

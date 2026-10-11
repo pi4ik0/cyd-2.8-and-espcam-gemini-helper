@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SUD Flasher</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, sans-serif; background: #121212; color: #eee; max-width: 720px; margin: 0 auto; padding: 16px; line-height: 1.5; }
+  h1 { color: #ff8c00; margin-bottom: 4px; }
+  h2 { margin: 0 0 8px; font-size: 1.15em; }
+  .card { background: #1e1e1e; border: 1px solid #333; border-radius: 14px; padding: 16px; margin: 16px 0; }
+  .sub { color: #999; font-size: .9em; }
+  button[slot="activate"] { font: inherit; background: #ff8c00; color: #fff; border: 0; border-radius: 10px; padding: 12px 22px; font-weight: 600; }
+  table { border-collapse: collapse; margin: 10px 0; }
+  td, th { border: 1px solid #444; padding: 6px 12px; text-align: left; }
+  code { background: #2a2a2a; padding: 1px 6px; border-radius: 5px; }
+  ol, ul { padding-left: 22px; }
+  .warn { color: #ffb74d; }
+</style>
+</head>
+<body>
+
+<h1>SUD Flasher</h1>
+<p class="sub">Flash the firmware straight from the browser. Use <b>Chrome or Edge on a computer</b> (needs Web Serial). Firmware build: <code>__VER__</code></p>
+
+<div class="card">
+  <h2>1. Display (CYD ESP32-2432S028)</h2>
+  <ol>
+    <li>Connect the CYD to the computer with a USB cable.</li>
+    <li>Click the button, choose the serial port, press Install.</li>
+  </ol>
+  <esp-web-install-button manifest="manifest-cyd.json">
+    <button slot="activate">Flash CYD</button>
+    <span slot="unsupported" class="warn">Open this page in desktop Chrome or Edge.</span>
+    <span slot="not-allowed" class="warn">This page must be opened over HTTPS.</span>
+  </esp-web-install-button>
+</div>
+
+<div class="card">
+  <h2>2. Camera (ESP32-CAM) via a USB-TTL adapter</h2>
+  <p>The ESP32-CAM has no USB port, so use a USB-TTL adapter (CP2102 / CH340 / FT232).</p>
+  <table>
+    <tr><th>ESP32-CAM</th><th>USB-TTL adapter</th></tr>
+    <tr><td>5V</td><td>5V</td></tr>
+    <tr><td>GND</td><td>GND</td></tr>
+    <tr><td>U0R</td><td>TX</td></tr>
+    <tr><td>U0T</td><td>RX</td></tr>
+    <tr><td>IO0</td><td>GND &nbsp;(only while flashing)</td></tr>
+  </table>
+  <p class="sub">TX goes to RX and RX goes to TX (crossed). If the adapter has a 3.3V/5V jumper, leave it on 3.3V logic where possible; the camera is powered from the 5V pin.
+  If the board keeps rebooting, the adapter cannot supply enough current: power the CAM from a better 5V source (join the grounds) and add a 470-1000 uF capacitor between 5V and GND.</p>
+  <ol>
+    <li>Wire it as in the table, with the <b>IO0 &rarr; GND</b> wire in place.</li>
+    <li>Plug the adapter into the computer and press the small <b>RESET</b> button on the CAM once (this enters flashing mode).</li>
+    <li>Click the button, choose the adapter's port, tick <b>Erase device</b> the first time, press Install.</li>
+    <li>When it says it is done: <b>remove the IO0 &rarr; GND wire</b> and press RESET again.</li>
+  </ol>
+  <esp-web-install-button manifest="manifest-cam.json">
+    <button slot="activate">Flash ESP32-CAM</button>
+    <span slot="unsupported" class="warn">Open this page in desktop Chrome or Edge.</span>
+    <span slot="not-allowed" class="warn">This page must be opened over HTTPS.</span>
+  </esp-web-install-button>
+  <p class="sub">The adapter has no auto-reset lines wired, so if the connection fails, press RESET on the CAM and try again (IO0 must still be tied to GND).</p>
+</div>
+
+<div class="card">
+  <h2>3. First setup after flashing</h2>
+  <p><b>Camera:</b> if it cannot connect, it opens its own network <code>SUD-CAM</code> (password <code>cyddisplay</code>). Join it with your phone, open <code>http://192.168.4.1</code>, and enter your Wi-Fi name, Wi-Fi password and the Gemini API key. Save, and it restarts.</p>
+  <p><b>Display:</b> on the first start it asks you to tap three crosses (touch calibration). In the calculator type <code>1337</code> and press <code>=</code>, enter the PIN <code>2580</code>, open <b>WEB</b>, press <b>AP ON</b>. Join the network <code>SUD</code> (password <code>cyddisplay</code>), open <code>http://sud.local</code> (or <code>192.168.4.1</code>), log in as <code>admin</code> / <code>cyddisplay</code> and use <b>Settings</b> to set the Wi-Fi name and password (the same network as the camera), a new PIN, secret combo and password.</p>
+  <p class="sub">The firmware contains no passwords or keys, everything is stored on the device. The "Erase device" option clears the settings.</p>
+</div>
+
+</body>
+</html>
